@@ -22,11 +22,14 @@ import ProductionDisplay from "./pages/ProductionDisplay";
 import MonitorDisplay from "./pages/MonitorDisplay";
 import ProductsToRestock from "./pages/ProductsToRestock";
 import MarketplaceOrders from "./pages/MarketplaceOrders";
+import CashManagement from "./pages/CashManagement";
+import Settings from "./pages/Settings";
 import Suppliers from "./pages/Suppliers";
 import Employees from "./pages/Employees";
 import Invoices from "./pages/Invoices";
 import Assets from "./pages/Assets";
 import UserManagement from "./pages/UserManagement";
+import NoPermissions from "./pages/NoPermissions";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,7 +45,9 @@ const App = () => (
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<PermissionRoute permission="dashboard"><Layout><Dashboard /></Layout></PermissionRoute>} />
+              <Route path="/dashboard" element={<PermissionRoute permission="dashboard" fallbackPath="/cash-management"><Layout><Dashboard /></Layout></PermissionRoute>} />
+              <Route path="/cash-management" element={<PermissionRoute permission="cash-management"><Layout><CashManagement /></Layout></PermissionRoute>} />
+              <Route path="/settings" element={<PermissionRoute permission="settings"><Layout><Settings /></Layout></PermissionRoute>} />
               <Route path="/products" element={<PermissionRoute permission="products"><Layout><Products /></Layout></PermissionRoute>} />
               <Route path="/sales" element={<PermissionRoute permission="sales"><Layout><Sales /></Layout></PermissionRoute>} />
               <Route path="/reports" element={<PermissionRoute permission="reports"><Layout><Reports /></Layout></PermissionRoute>} />
@@ -60,6 +65,7 @@ const App = () => (
               <Route path="/invoices" element={<PermissionRoute permission="invoices"><Layout><Invoices /></Layout></PermissionRoute>} />
               <Route path="/assets" element={<PermissionRoute permission="assets"><Layout><Assets /></Layout></PermissionRoute>} />
               <Route path="/user-management" element={<ProtectedRoute><Layout><UserManagement /></Layout></ProtectedRoute>} />
+              <Route path="/no-permissions" element={<NoPermissions />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

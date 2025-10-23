@@ -14,7 +14,9 @@ export type Permission =
   | 'suppliers' 
   | 'employees' 
   | 'invoices' 
-  | 'assets';
+  | 'assets'
+  | 'cash-management'
+  | 'settings';
 
 interface User {
   username: string;

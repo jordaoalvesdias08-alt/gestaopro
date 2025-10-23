@@ -40,26 +40,32 @@ import {
 import { Button } from "@/components/ui/button";
 
 const navigationItems = [
-  { title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard },
-  { title: "Relatórios", url: createPageUrl("Reports"), icon: BarChart2 },
-  { title: "Produção", url: createPageUrl("Production"), icon: Factory },
-  { title: "Pedidos Marketplace", url: "/marketplace-orders", icon: ShoppingBag },
-  { title: "Produtos", url: createPageUrl("Products"), icon: Package },
-  { title: "Serviços", url: createPageUrl("Services"), icon: Wrench },
-  { title: "Despesas", url: createPageUrl("Expenses"), icon: Receipt },
-  { title: "Vendas", url: createPageUrl("Sales"), icon: ShoppingCart },
-  { title: "Estoque", url: createPageUrl("Materials"), icon: FileText },
-  { title: "Fornecedores", url: createPageUrl("Suppliers"), icon: Truck },
-  { title: "Clientes", url: createPageUrl("Customers"), icon: Users },
-  { title: "Funcionários", url: createPageUrl("Employees"), icon: UserCog },
-  { title: "Notas Fiscais", url: createPageUrl("Invoices"), icon: FileDigit },
-  { title: "Máquinas e Veículos", url: createPageUrl("Assets"), icon: Car },
+  { title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard, permission: "dashboard" },
+  { title: "Relatórios", url: createPageUrl("Reports"), icon: BarChart2, permission: "reports" },
+  { title: "Gestão de Caixa", url: "/cash-management", icon: Receipt, permission: "cash-management" },
+  { title: "Produção", url: createPageUrl("Production"), icon: Factory, permission: "production" },
+  { title: "Pedidos Marketplace", url: "/marketplace-orders", icon: ShoppingBag, permission: "marketplace-orders" },
+  { title: "Produtos", url: createPageUrl("Products"), icon: Package, permission: "products" },
+  { title: "Serviços", url: createPageUrl("Services"), icon: Wrench, permission: "services" },
+  { title: "Despesas", url: createPageUrl("Expenses"), icon: Receipt, permission: "expenses" },
+  { title: "Vendas", url: createPageUrl("Sales"), icon: ShoppingCart, permission: "sales" },
+  { title: "Estoque", url: createPageUrl("Materials"), icon: FileText, permission: "materials" },
+  { title: "Fornecedores", url: createPageUrl("Suppliers"), icon: Truck, permission: "suppliers" },
+  { title: "Clientes", url: createPageUrl("Customers"), icon: Users, permission: "customers" },
+  { title: "Funcionários", url: createPageUrl("Employees"), icon: UserCog, permission: "employees" },
+  { title: "Notas Fiscais", url: createPageUrl("Invoices"), icon: FileDigit, permission: "invoices" },
+  { title: "Máquinas e Veículos", url: createPageUrl("Assets"), icon: Car, permission: "assets" },
+  { title: "Configurações", url: "/settings", icon: Settings, permission: "settings" },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, logout, hasPermission } = useAuth();
+
+  const visibleItems = navigationItems.filter(item => 
+    !item.permission || hasPermission(item.permission as any)
+  );
 
   return (
     <SidebarProvider>
@@ -109,7 +115,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               )}
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {navigationItems.map((item) => (
+                  {visibleItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton 
                         asChild 

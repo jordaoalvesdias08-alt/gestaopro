@@ -7,11 +7,18 @@ import { Factory, Clock, Package, AlertTriangle, ShoppingCart, ShoppingBag, MapP
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { SoundAlertControl } from "@/components/SoundAlertControl";
+import { useSoundAlert } from "@/contexts/SoundAlertContext";
 
 // Dashboard de Produção para Monitor Externo - ROTAÇÃO AUTOMÁTICA
 export default function ProductionDisplay() {
   const [currentView, setCurrentView] = useState<'orders' | 'materials' | 'products' | 'marketplace'>('orders');
   const [showControls, setShowControls] = useState(false);
+  const { playAlert } = useSoundAlert();
+
+  // Tocar som ao carregar
+  useEffect(() => {
+    playAlert();
+  }, []);
 
   // Rotação automática a cada 5 segundos
   useEffect(() => {
@@ -252,38 +259,50 @@ export default function ProductionDisplay() {
               marketplaceOrders.map((order: any) => (
                 <Card 
                   key={order.id} 
-                  className="bg-gradient-to-br from-purple-900 to-blue-900 border-2 border-purple-600 shadow-2xl"
+                  className="bg-gradient-to-br from-purple-900 to-blue-900 border-2 border-purple-600 shadow-2xl hover:shadow-purple-500/30 transition-all duration-300"
                 >
-                  <CardHeader className="pb-4">
+                  <CardHeader className="pb-4 bg-gradient-to-r from-purple-700 to-pink-700">
                     <div className="flex items-start justify-between">
-                      <CardTitle className="text-2xl text-white font-bold">
+                      <CardTitle className="text-3xl text-white font-bold">
                         {order.order_number}
                       </CardTitle>
-                      <Badge className="bg-yellow-500 text-white text-sm px-3 py-1">
+                      <Badge className="bg-yellow-500 text-white text-lg px-4 py-2">
                         PENDENTE
                       </Badge>
                     </div>
-                    <p className="text-purple-200 text-lg">{order.customer_name}</p>
+                    <p className="text-purple-100 text-xl mt-2">{order.customer_name}</p>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    {order.items.map((item: any, idx: number) => (
-                      <div key={idx} className="bg-black/30 p-4 rounded-lg">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1">
-                            <p className="text-white text-lg font-semibold">{item.product}</p>
-                            <p className="text-green-400 text-2xl font-bold mt-1">
-                              Qtd: {item.quantity}
-                            </p>
+                  <CardContent className="pt-6 space-y-4">
+                    <div className="space-y-3">
+                      {order.items.map((item: any, idx: number) => (
+                        <div key={idx} className="bg-black/40 p-5 rounded-lg border border-purple-500/30">
+                          <div className="mb-3">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Package className="w-5 h-5 text-purple-300" />
+                              <span className="text-purple-300 text-sm font-semibold">ITEM</span>
+                            </div>
+                            <p className="text-white text-2xl font-bold">{item.product}</p>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4 mb-3">
+                            <div className="bg-black/30 p-3 rounded-lg">
+                              <p className="text-purple-300 text-sm mb-1">QUANTIDADE</p>
+                              <p className="text-green-400 text-3xl font-bold">{item.quantity}</p>
+                            </div>
+                            
+                            {item.location && (
+                              <div className="bg-black/30 p-3 rounded-lg">
+                                <p className="text-purple-300 text-sm mb-1">LOCALIZAÇÃO</p>
+                                <div className="flex items-center gap-2">
+                                  <MapPin className="w-5 h-5 text-blue-400" />
+                                  <p className="text-blue-400 text-lg font-semibold">{item.location}</p>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
-                        {item.location && (
-                          <div className="flex items-center gap-2 mt-3 text-blue-300">
-                            <MapPin className="w-4 h-4" />
-                            <p className="text-sm">{item.location}</p>
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </CardContent>
                 </Card>
               ))
