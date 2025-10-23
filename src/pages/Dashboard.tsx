@@ -81,6 +81,7 @@ export default function Dashboard() {
   const totalRevenueWithServices = totalRevenue + servicesRevenue;
   const totalExpenses = expenses.reduce((sum, e) => sum + (e.value || 0), 0);
   const totalProfit = sales.reduce((sum, sale) => sum + (sale.total_profit || 0), 0) - totalExpenses;
+  const cashBalance = totalRevenueWithServices - totalExpenses;
 
   const lowStockMaterials = materials.filter(m => (m.quantity || 0) <= (m.minimum_quantity || 0));
 
@@ -151,7 +152,13 @@ export default function Dashboard() {
           <AISearch />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+          <StatsCard
+            title="Saldo em Caixa"
+            value={`R$ ${cashBalance.toFixed(2)}`}
+            icon={DollarSign}
+            bgColor="bg-emerald-500"
+          />
           <StatsCard
             title="Receita Total (Geral)"
             value={`R$ ${totalRevenueWithServices.toFixed(2)}`}

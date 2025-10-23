@@ -264,10 +264,93 @@ export default function Settings() {
         <TabsContent value="backup">
           <Card>
             <CardContent className="pt-6">
-              <h3 className="text-2xl font-bold mb-6">Backup e Restauração</h3>
-              <div className="text-center py-12">
-                <Database className="w-16 h-16 mx-auto mb-4 text-slate-300" />
-                <p className="text-slate-600 mb-4">Em breve: Sistema de backup automático</p>
+              <h3 className="text-2xl font-bold mb-6">Configurações de Backup</h3>
+              
+              <div className="space-y-8">
+                <div>
+                  <Label className="text-lg font-semibold mb-3 block">Fazer Backup dos Dados</Label>
+                  <p className="text-slate-600 mb-4">
+                    Baixe todos os seus dados incluindo pedidos marketplace, configurações e alertas.
+                  </p>
+                  <Button 
+                    onClick={() => {
+                      try {
+                        const backupData = {
+                          timestamp: new Date().toISOString(),
+                          marketplace_orders: localStorage.getItem('marketplace_orders'),
+                          alert_mode: localStorage.getItem('alert_mode'),
+                          version: '1.0'
+                        };
+                        const dataStr = JSON.stringify(backupData, null, 2);
+                        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                        const url = URL.createObjectURL(dataBlob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `backup-${new Date().toISOString().split('T')[0]}.json`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                      } catch (error) {
+                        console.error('Erro ao fazer backup:', error);
+                      }
+                    }} 
+                    className="w-full sm:w-auto"
+                  >
+                    <Database className="w-4 h-4 mr-2" />
+                    Baixar Backup
+                  </Button>
+                </div>
+
+                <div className="border-t pt-6">
+                  <Label className="text-lg font-semibold mb-3 block">Restaurar Backup</Label>
+                  <p className="text-slate-600 mb-4">
+                    Carregue um arquivo de backup anterior para restaurar seus dados.
+                  </p>
+                  <div>
+                    <input
+                      type="file"
+                      accept=".json"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                          try {
+                            const backup = JSON.parse(e.target?.result as string);
+                            if (backup.marketplace_orders) {
+                              localStorage.setItem('marketplace_orders', backup.marketplace_orders);
+                            }
+                            if (backup.alert_mode) {
+                              localStorage.setItem('alert_mode', backup.alert_mode);
+                            }
+                            alert('Backup restaurado com sucesso! A página será recarregada.');
+                            setTimeout(() => window.location.reload(), 1000);
+                          } catch (error) {
+                            alert('Erro ao restaurar backup. Arquivo inválido.');
+                          }
+                        };
+                        reader.readAsText(file);
+                      }}
+                      className="hidden"
+                      id="backup-upload"
+                    />
+                    <label htmlFor="backup-upload">
+                      <Button asChild variant="outline" className="w-full sm:w-auto cursor-pointer">
+                        <span>
+                          <Database className="w-4 h-4 mr-2" />
+                          Carregar Backup
+                        </span>
+                      </Button>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <p className="text-sm text-yellow-800">
+                    <strong>Atenção:</strong> Ao restaurar um backup, todos os dados atuais serão substituídos.
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
